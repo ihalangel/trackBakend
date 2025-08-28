@@ -1,0 +1,112 @@
+Claro, a partir del trabajo realizado, aquí están los documentos clave que cubren la base de datos y detalles completos para tu proyecto:
+
+***
+
+## 1. Documento de Modelo de Datos
+
+### Descripción general
+
+| Colección             | Descripción                                    |
+|-----------------------|------------------------------------------------|
+| Users (Usuarios)       | Almacena usuarios con roles, créditos, y yardas asignadas para comprobadores. |
+| Yardas (Yardas)        | Representa yardas bajo responsabilidad de masters con ubicación y radio geográfico. |
+| Cargas (UnidadesCarga) | Colección unificada con discriminadores para tipos variados de carga como Contenedor, Chassis, Trailer, BoxTruck, etc. |
+| Registros              | Guarda registros de entradas y salidas por carga, en una yarda, con validaciones múltiples y ubicación. |
+| Transacciones Créditos | Controla movimientos de créditos para consumo y recarga, relacionados con masters y yardas. |
+
+### Modelos y campos claves
+
+- **Users**: nombre, email, passwordHash, rol, créditos (solo masters), yardasAsignadas (para comprobadores), referidoPor (para sistema referidos), estados, fechaCreacion.
+- **Yardas**: nombre, masterId, ubicación geoespacial, radioGeografico, estado.
+- **Cargas**: tipoCarga (discriminador), código único, estado, ubicación actual, historial de estados, detalles específicos según tipo.
+- **Registros**: cargaId, yardaId, tipo (entrada/salida), usuarioId, fecha, ubicación, estadoValidacion, notas, validaciones (con usuarios y resultados).
+- **Transacciones Créditos**: masterId, yardaId, tipoTransacción (recarga/consumo), cantidad, fecha, referencia.
+
+### Relaciones clave
+
+- Un master tiene múltiples yardas.
+- Comprobadores tienen múltiples yardas asignadas.
+- Un registro vincula carga con yarda y usuario (driver).
+- Validaciones son múltiples por registro, realizadas por comprobadores o master.
+- Créditos se asocian única y exclusivamente a masters.
+
+***
+
+## 2. Documento de Flujos y Lógica del Negocio
+
+### Flujos principales
+
+- **Registro de carga**: driver registra entrada/salida con ubicación y tipo. Estado inicial pendiente.
+- **Validación**: comprobadores y master validan registros con posibilidad de validaciones múltiples. Validaciones exitosas consumen créditos.
+- **Consumo y recarga créditos**: sólo masters pueden recargar créditos; consumo ocurre en validación exitosa.
+- **Estados**: cargas y registros cambian de estado según validaciones; se guarda historial completo.
+- **Validación geográfica**: se valida que la ubicación de registro esté dentro del radio de la yarda.
+- **Referidos**: usuarios pueden ser referidos por otros; útil para incentivos y control de relaciones.
+
+### Permisos y roles
+
+- Drivers: pueden registrar cargas y ver sus registros.
+- Comprobadores: pueden validar registros en yardas asignadas.
+- Masters: gestionan yardas, validaciones, créditos y reportes.
+- Super-admins: control total, gestión usuarios y configuraciones.
+
+***
+
+## 3. Manual Técnico de API y Acceso a Datos
+
+### Endpoints esenciales (ejemplos)
+
+- POST /usuarios - Crear usuario
+- GET /usuarios/:id - Obtener usuario con roles y yardas
+- POST /yardas - Crear yarda
+- GET /yardas/:id - Obtener info de yarda, ubicación y radio
+- POST /cargas - Registrar carga (unidades)
+- GET /cargas/:id - Consultar detalles y estado
+- POST /registros - Registrar entrada/salida carga
+- PATCH /registros/:id/validar - Validar registro (comprobador/master)
+- POST /creditos/recarga - Recargar créditos (solo master)
+- GET /reportes/creditos - Reporte histórico créditos por yarda/master
+
+### Validaciones
+
+- Validar estados y transiciones
+- Comprobar saldo de créditos previo a consumo
+- Validación de ubicación geoespacial
+- Control de acceso por rol y permiso
+
+***
+
+## 4. Especificaciones Técnicas
+
+- Índices geoespaciales en campos ubicación (yardas y registros).
+- Índices únicos para códigos de carga y usuarios.
+- Configuración de roles para RBAC (control de accesos en backend).
+- Estrategias de respaldo y recuperación en MongoDB.
+- Gestión de hashes y seguridad para almacenamiento de contraseñas.
+- Escalabilidad con sharding o réplicas según necesidades.
+
+***
+
+## 5. Manual de Instalación y Mantenimiento
+
+- Requisitos: Node.js, MongoDB (Atlas o local), Mongoose.
+- Comandos de inicialización de base de datos y colecciones.
+- Instrucciones para desplegar backend y conectar frontend.
+- Procedimientos de backup y restores periódicos.
+- Actualización de esquemas y migraciones.
+- Monitorización y logs para auditoría y rendimiento.
+
+***
+
+¿Se quiere que entregue una versión editable en doc o markdown para poder ir completando y compartiendo con el equipo?
+
+[1](https://gist.github.com/Katthacar/c0d307b6dfcb811cf775434480172b42)
+[2](https://cloud.google.com/dataflow/docs/guides/templates/provided/mongodb-to-bigquery)
+[3](https://www.youtube.com/watch?v=KQdIobNHp70)
+[4](https://aula301.com/tipos-datos-podemos-utilizar-mongodb/)
+[5](https://www.mongodb.com/docs/manual/data-modeling/)
+[6](https://www.mongodb.com/resources/basics/databases/document-databases)
+[7](https://www.mongodb.com/docs/)
+[8](https://www.mongodb.com/es/resources/products/fundamentals/create-database)
+[9](https://repository.udistrital.edu.co/bitstreams/972fcc07-b3fa-4411-ae03-542b70e5948b/download)
+[10](https://studio3t.com/es/knowledge-base/articles/mongodb-aggregation-framework/)
